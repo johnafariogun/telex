@@ -68,6 +68,7 @@ def get_integration_json(request: Request):
                 "background_color": "#fff"
             },
             "integration_type": "interval",
+            "integration_category": "Website Uptime",
             "key_features": [
             "\"checks uptime\""
             ],
