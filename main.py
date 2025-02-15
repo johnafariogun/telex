@@ -16,7 +16,45 @@ app.add_middleware(
         allow_headers=["*"],
         allow_credentials=True,
     )
-
+'''
+{
+  "data": {
+    "date": {
+      "created_at": "2025-02-15",
+      "updated_at": "2025-02-15"
+    },
+    "descriptions": {
+      "app_name": "Uptime monitress",
+      "app_description": "My uptime checker",
+      "app_logo": "https://i.imgur.com/lZqvffp.png",
+      "app_url": "https://telex-uo3s.onrender.com/",
+      "background_color": "#fff"
+    },
+    "is_active": true,
+    "integration_type": "interval",
+    "key_features": [
+      "\"checks uptime\""
+    ],
+    "author": "Johne",
+    "settings": [
+      {
+        "label": "site2",
+        "type": "text",
+        "required": true,
+        "default": "text"
+      },
+      {
+        "label": "Interval",
+        "type": "text",
+        "required": true,
+        "default": "* * * *"
+      }
+    ],
+    "target_url": "https://telex-uo3s.onrender.com",
+    "tick_url": "https://telex-uo3s.onrender.com/tick"
+  }
+}
+'''
 @app.get("/integration.json")
 def get_integration_json(request: Request):
     base_url = str(request.base_url).rstrip("/")
@@ -29,6 +67,10 @@ def get_integration_json(request: Request):
                 "app_logo": "https://i.imgur.com/lZqvffp.png",
                 "background_color": "#fff"
             },
+            "integration_type": "interval",
+            "key_features": [
+            "\"checks uptime\""
+            ],
             "integration_type": "interval",
             "settings": [
                 {"label": "site-1", "type": "text", "required": True, "default": ""},
