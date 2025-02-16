@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-fastapi
-httpx
 asyncio
-pydantic
-uvicorn
-
-=======
 annotated-types==0.7.0
 anyio==4.8.0
 certifi==2025.1.31
@@ -40,4 +33,3 @@ typing_extensions==4.12.2
 urllib3==2.3.0
 uvicorn==0.34.0
 wrapt==1.17.2
->>>>>>> c70a9bc40cc40becdb0cea5d32a65d39e7799c39
