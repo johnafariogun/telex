@@ -46,8 +46,8 @@ def get_integration_json(request: Request):
         }
     }
 
-
-def get_modifier_integration_json(request: Request):
+@app.get("/get_modifier_integration_json")
+async def get_modifier_integration_json(request: Request):
     base_url = str(request.base_url).rstrip("/")
     return {
         "data": {
@@ -95,7 +95,7 @@ def get_modifier_integration_json(request: Request):
                 }
             ],
             "target_url": f"{base_url}",
-            "tick_url": f"{base_url}/modifier/tick",
+            "tick_url": f"{base_url}/format_message",
         }
     }
 
