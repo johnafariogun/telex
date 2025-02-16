@@ -41,7 +41,8 @@ def get_integration_json(request: Request):
                 {"label": "site-2", "type": "text", "required": True, "default": ""},
                 {"label": "interval", "type": "text", "required": True, "default": "* * * * *"}
             ],
-            "tick_url": f"{base_url}/tick"
+            "tick_url": f"{base_url}/tick",
+            "target_url": f"{base_url}"
         }
     }
 
