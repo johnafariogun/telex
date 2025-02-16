@@ -63,7 +63,7 @@ async def check_site_status(site: str) -> str:
         async with httpx.AsyncClient() as client:
             response = await client.get(site, timeout=10)
             if response.status_code < 400:
-                return None
+                return f"{site} is still up, we are good at  (status {response.status_code})"
             return f"{site} is down (status {response.status_code})"
     except Exception as e:
         return f"{site} check failed: {str(e)}"
@@ -76,7 +76,7 @@ async def monitor_task(payload: MonitorPayload):
 
     # data follows telex webhook format. Your integration must call the return_url using this format
     data = {
-        "message": message,
+        "message": message or "We are still up",
         "username": "Uptime Monitor",
         "event_name": "Uptime Check",
         "status": "error"
