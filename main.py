@@ -194,7 +194,8 @@ async def handle_incoming_message(msg_req: MessageRequest):
         "status": "success",
         "username": "message-formatter-bot",
     }
-
+    async with httpx.AsyncClient() as client:
+        await client.post(msg_req.return_url, json=response)
     return JSONResponse(content=response)
 
 
