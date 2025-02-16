@@ -5,7 +5,7 @@ from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 from pydantic import BaseModel
-from typing import List
+from typing import List, Union
 import httpx
 import asyncio
 
@@ -45,6 +45,60 @@ def get_integration_json(request: Request):
             "target_url": f"{base_url}"
         }
     }
+
+
+def get_modifier_integration_json(request: Request):
+    base_url = str(request.base_url).rstrip("/")
+    return {
+        "data": {
+            "descriptions": {
+                "app_name": "Word modifier",
+                "app_description": "Modifies words",
+                "app_url": base_url,
+                "app_logo": "https://media.tifi.tv/telexbucket/public/logos/formatter.png",
+                "background_color": "#fffddd"
+            },
+            "integration_type": "modifier",
+            "integration_category": " Communication & Collaboration",
+            "key_features": [
+			"Receive messages from Telex channels.",
+			"Format messages based on predefined templates or logic.",
+			"Send formatted responses back to the channel.",
+			"Log message formatting activity for auditing purposes."
+            ],
+            "permissions": {
+                "events": [
+                    "Receive messages from Telex channels.",
+                    "Format messages based on predefined templates or logic.",
+                    "Send formatted responses back to the channel.",
+                    "Log message formatting activity for auditing purposes."
+                ]
+            },
+            "settings": [
+                {
+                    "default": 100,
+                    "label": "maxMessageLength",
+                    "required": True,
+                    "type": "number"
+                },
+                {
+                    "default": "world,happy",
+                    "label": "repeatWords",
+                    "required": True,
+                    "type": "multi-select"
+                },
+                {
+                    "default": 2,
+                    "label": "noOfRepetitions",
+                    "required": True,
+                    "type": "number"
+                }
+            ],
+            "target_url": f"{base_url}",
+            "tick_url": f"{base_url}/modifier/tick",
+        }
+    }
+
 
 
 class Setting(BaseModel):
@@ -92,6 +146,57 @@ async def monitor_task(payload: MonitorPayload):
 def monitor(payload: MonitorPayload, background_tasks: BackgroundTasks):
     background_tasks.add_task(monitor_task, payload)
     return {"status": "accepted"}
+
+
+
+class SettingModifier(BaseModel):
+    label: str
+    default: Union[str, float]  # Handles both string and numeric values
+
+class MessageRequest(BaseModel):
+    message: str
+    settings: List[SettingModifier]
+
+def settings_processing(msg_req: MessageRequest) -> str:
+    max_message_length = 500
+    repeat_words = []
+    no_of_repetitions = 1
+
+    # Extract settings
+    for setting in msg_req.settings:
+        if setting.label == "maxMessageLength" and isinstance(setting.default, (int, float)):
+            max_message_length = int(setting.default)
+        elif setting.label == "repeatWords" and isinstance(setting.default, str):
+            repeat_words = setting.default.split(", ")
+        elif setting.label == "noOfRepetitions" and isinstance(setting.default, (int, float)):
+            no_of_repetitions = int(setting.default)
+
+    formatted_message = msg_req.message
+
+    # Repeat specified words
+    for word in repeat_words:
+        formatted_message = formatted_message.replace(word, (word + " ") * no_of_repetitions)
+
+    # Apply maxMessageLength constraint
+    if len(formatted_message) > max_message_length:
+        formatted_message = formatted_message[:max_message_length]
+
+    return formatted_message
+
+
+@app.post("/format_message")
+async def handle_incoming_message(msg_req: MessageRequest):
+    formatted_message = settings_processing(msg_req)
+
+    response = {
+        "event_name": "message_formatted",
+        "message": formatted_message,
+        "status": "success",
+        "username": "message-formatter-bot",
+    }
+
+    return JSONResponse(content=response)
+
 
 @app.get('/')
 async def get_info():
